@@ -94,7 +94,7 @@
 
 <div align="center">
 
-https://github.com/user-attachments/assets/替换为你的视频上传后的ID
+<video src="https://github.com/ymhHAHA/AI-Literature-Copilot/blob/main/showcase/demo.mp4?raw=true" controls="controls" width="100%" height="auto"></video>
 
 </div>
 
