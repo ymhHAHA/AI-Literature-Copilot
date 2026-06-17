@@ -92,7 +92,7 @@
 
 ### 3.2 演示
 
-https://github.com/ymhHAHA/AI-Literature-Copilot/blob/main/showcase/demo.mp4
+<video src="./showcase/demo.mp4" controls="controls" width="100%" height="auto"></video>
 
 ### 3.3 技术栈
 
