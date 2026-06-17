@@ -92,9 +92,7 @@
 
 ### 3.2 演示
 
-<div align="center">
-  <video src="https://ghp.ci/https://raw.githubusercontent.com/ymhHAHA/AI-Literature-Copilot/main/showcase/demo.mp4" controls="controls" width="100%" height="auto"></video>
-</div>
+![系统配置](showcase/demo.gif)
 
 ### 3.3 技术栈
 
