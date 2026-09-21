@@ -1,6 +1,6 @@
 # 文域星图
 
-> 基于 LLM 的生物信息学 & AI 文献智能检索与推送系统
+> 文献智能检索统
 
 ---
 
@@ -28,7 +28,6 @@
 | **多源统一检索** | 一次查询同时搜索 PubMed、arXiv、bioRxiv，自动去重排序 |
 | **智能需求解析** | LLM 自动提取关键词、时间范围、过滤条件 |
 | **自动中文总结** | 为每篇论文生成中文摘要，并输出整体研究趋势报告 |
-| **定时自动推送** | 每日定时检索并推送最新文献到邮箱，零人工干预 |
 
 ---
 
@@ -68,20 +67,6 @@
 | **单篇中文摘要** | 为每篇论文生成结构化中文总结（研究目的、方法、发现、意义） |
 | **深度分析** | 针对单篇论文进行深度解读，支持交互式追问 |
 
-### 2.5 邮件推送与定时任务
-
-- **HTML 格式邮件**：包含论文卡片、中文总结、趋势报告
-- **RIS 格式导出**：支持导出到 EndNote/Zotero 等文献管理工具
-- **定时推送**：通过 `schedule` 库实现每日定时检索和推送
-- **去重机制**：自动记录已推送论文，避免重复发送
-
-### 2.6 Web 交互界面
-
-- **零依赖前端**：纯 stdlib `http.server` 实现，无需 Flask/Django
-- **实时流式响应**：NDJSON 流式推送搜索和分析进度
-- **会话管理**：多用户会话隔离，支持并发访问
-- **在线配置**：浏览器内配置 LLM API Key、SMTP 邮箱等
-
 ---
 
 ## 3. 系统架构与技术栈 (Architecture & Tech Stack)
@@ -94,30 +79,13 @@
 
 ![系统配置](showcase/demo.gif)
 
-### 3.3 技术栈
-
-| 层级 | 技术 | 说明 |
-|------|------|------|
-| **LLM 接入** | OpenAI SDK | 兼容 OpenAI / 通义千问 / DeepSeek / 本地部署 |
-| **文献检索** | Biopython (Entrez) | PubMed API |
-| | arxiv Python SDK | arXiv API |
-| | requests | bioRxiv / OpenAlex REST API |
-| **RAG / 知识库** | OpenAI Embeddings | 领域分类向量检索 |
-| | CWTS Classification | 期刊来源层级分类 |
-| | Scimago JR | 期刊影响因子数据 |
-| **Web 服务** | stdlib http.server | 零依赖 HTTP 服务 |
-| | NDJSON Streaming | 实时进度推送 |
-| **缓存** | Redis | 搜索结果缓存（TTL 4h） |
-| **定时任务** | schedule | 每日定时推送 |
-| **部署** | Docker / Docker Compose | 容器化部署 |
-
 ---
 
 ## 5. 核心技术挑战与解决方案 (Technical Challenges & Showcases)
 
 ### 挑战 1：自然语言需求的鲁棒解析
 
-**问题**：用户输入千差万别，如"帮我找最近3年CRISPR和基因编辑的文献，IF>5，发到xxx@xxx.com"，需要同时提取关键词、时间范围、过滤条件和邮箱。
+**问题**：用户输入千差万别，如"帮我找最近3年CRISPR和基因编辑的文献，IF>5"，需要同时提取关键词、时间范围、过滤条件。
 
 **解决方案**：正则预解析 + LLM 精细解析的双层架构
 
@@ -172,22 +140,6 @@ _LLM_SEMAPHORE = threading.BoundedSemaphore(max_concurrent)  # 限制最大并�
 - 瞬态错误检测：connection error, timeout, rate limit
 ```
 
-### 挑战 4：零依赖 Web 服务的实时体验
-
-**问题**：文献搜索和 LLM 总结耗时较长（30s-3min），传统 HTTP 请求会超时，用户体验差。
-
-**解决方案**：NDJSON 流式推送
-
-```
-客户端请求 → 服务端启动后台线程
-         ← {"type":"progress","step":"searching","message":"正在检索 PubMed..."}
-         ← {"type":"progress","step":"summarizing","message":"正在生成总结 3/20..."}
-         ← {"type":"result","data":{...}}
-         ← {"type":"done"}
-```
-
-- 使用 `Thread + Queue` 模式，后台线程执行耗时任务，主线程实时推送进度
-- 无需 WebSocket，兼容所有浏览器
 
 ### 挑战 5：领域知识增强检索质量
 
